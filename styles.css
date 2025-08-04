@@ -1,0 +1,61 @@
+header{
+    background-color: #343a40;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    img{
+        border-radius: 50%;
+        width: 150px;
+        height: 150px;
+    }
+
+    h1{
+        font-size: 2.5rem;
+        margin: 10px 0;
+    }
+    p{
+        font-size: 1.2rem;
+        margin: 5px 0;
+    }
+}
+
+nav {
+    display: flex;
+    justify-content: center;
+    background-color: #495057;
+    padding: 10px;
+
+    a{
+        color: white;
+        text-decoration: none;
+        margin: 0 15px;
+        font-size: 1.1rem;
+    }
+}
+
+skills {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 800px;
+
+    h2{
+        text-align: center;
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    
+    ul{
+        list-style-type: none;
+        padding: 0;
+
+        li{
+            background-color: #e9ecef;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+    }
+    
+}
