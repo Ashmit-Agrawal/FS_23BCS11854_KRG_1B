@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>SVG Drawing Tool</title>
+  <style>
+    body { font-family: sans-serif; padding: 12px; }
+    #canvas { border:1px solid #ccc; width:800px; height:500px; display:block; }
+    .controls { margin-bottom:8px; }
+    button { margin-left:6px; }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <label>Color: <input type="color" id="color" value="#ff0000"></label>
+    <label>Radius: <input id="radius" type="number" value="20" min="1" max="200"></label>
+    <button id="undo">Undo</button>
+    <button id="clear">Clear</button>
+    <span style="margin-left:10px">Draw mode: Click to place circles; Drag for preview.</span>
+  </div>
+
+  <svg id="canvas" xmlns="http://www.w3.org/2000/svg"></svg>
+
+  <script>
+    const svg = document.getElementById('canvas');
+    const colorInput = document.getElementById('color');
+    const radiusInput = document.getElementById('radius');
+    const undoBtn = document.getElementById('undo');
+    const clearBtn = document.getElementById('clear');
+
+    let isDrawing = false;
+    let preview = null;
+    const undoStack = [];
+
+    function getSVGPoint(evt) {
+      const rect = svg.getBoundingClientRect();
+      return { x: evt.clientX - rect.left, y: evt.clientY - rect.top };
+    }
+
+    svg.addEventListener('mousedown', e => {
+      isDrawing = true;
+      const p = getSVGPoint(e);
+      preview = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      preview.setAttribute('cx', p.x);
+      preview.setAttribute('cy', p.y);
+      preview.setAttribute('r', radiusInput.value);
+      preview.setAttribute('fill', colorInput.value);
+      preview.setAttribute('fill-opacity', 0.8);
+      preview.setAttribute('stroke', '#000');
+      preview.setAttribute('stroke-opacity', 0.2);
+      svg.appendChild(preview);
+    });
+
+    svg.addEventListener('mousemove', e => {
+      if (!isDrawing || !preview) return;
+      const p = getSVGPoint(e);
+      preview.setAttribute('cx', p.x);
+      preview.setAttribute('cy', p.y);
+    });
+
+    svg.addEventListener('mouseup', e => {
+      if (!isDrawing || !preview) return;
+      isDrawing = false;
+      // finalize circle: set permanent attributes (remove stroke-opacity)
+      preview.setAttribute('r', radiusInput.value);
+      preview.setAttribute('fill', colorInput.value);
+      preview.setAttribute('stroke', '#000');
+      preview.setAttribute('stroke-opacity', 0.4);
+      preview.setAttribute('data-tool', 'circle');
+      // push to undo stack
+      undoStack.push(preview);
+      preview = null;
+    });
+
+    // click to add (for users who prefer click not drag)
+    svg.addEventListener('click', e => {
+      // if a drag just finished, click event may follow — prevent duplicate: only proceed if not drawing
+      if (isDrawing) return;
+      const p = getSVGPoint(e);
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx', p.x);
+      c.setAttribute('cy', p.y);
+      c.setAttribute('r', radiusInput.value);
+      c.setAttribute('fill', colorInput.value);
+      c.setAttribute('stroke', '#000');
+      c.setAttribute('stroke-opacity', 0.4);
+      svg.appendChild(c);
+      undoStack.push(c);
+    });
+
+    undoBtn.addEventListener('click', () => {
+      const last = undoStack.pop();
+      if (last && svg.contains(last)) svg.removeChild(last);
+    });
+
+    clearBtn.addEventListener('click', () => {
+      while (undoStack.length) {
+        const el = undoStack.pop();
+        if (svg.contains(el)) svg.removeChild(el);
+      }
+    });
+
+    // Optional: keyboard Undo (Ctrl+Z)
+    window.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z') {
+        const last = undoStack.pop();
+        if (last && svg.contains(last)) svg.removeChild(last);
+      }
+    });
+  </script>
+</body>
+</html>
