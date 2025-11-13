@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Responsive Navbar</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            color: white;
+            padding: 0.5em 1em;
+        }
+        .nav-links {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+        }
+        .nav-links li {
+            margin-left: 1em;
+        }
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+        }
+        .nav-links a.active{background:rgba(255,255,255,0.12)}
+        .hamburger {
+            display: none;
+            font-size: 1.5em;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
+
+        /* Sections: hide all by default; only .active is visible */
+        main > section{display:none}
+        main > section.active{display:block}
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                background-color: #333;
+                position: absolute;
+                top: 3.5em;
+                left: 0;
+            }
+            .nav-links.open {
+                display: flex;
+            }
+            .nav-links li {
+                margin: 1em 0;
+                text-align: center;
+            }
+            .hamburger {
+                display: block;
+            }
+        }
+        .container {
+            padding: 1em;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar" role="banner">
+        <div class="brand">MySite</div>
+
+        <button class="hamburger" aria-controls="primary-navigation" aria-expanded="false" aria-label="Toggle navigation">
+            ☰
+        </button>
+
+        <nav id="primary-navigation" aria-label="Primary" class="nav">
+            <ul class="nav-links" id="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>                                                                               
+
+    <main>
+        <section id="home" class="container">
+            <h1>Home</h1>
+        </section>
+
+        <section id="about" class="container">
+            <h2>About</h2>
+        </section>
+
+        <section id="contact" class="container">
+            <h2>Contact</h2>
+            <p>Contact: <a href="mailto:hello@example.com">hello@example.com</a></p>
+        </section>
+    </main>
+
+    <script>
+        (function(){
+            const sections = Array.from(document.querySelectorAll('main > section'));
+            const links = Array.from(document.querySelectorAll('#nav-links a'));
+
+            // Show only the target section (hash like '#about'). Defaults to '#home'
+            function showSection(hash){
+                const id = (hash && hash.startsWith('#')) ? hash.slice(1) : 'home';
+                sections.forEach(s=>{
+                    if(s.id === id) s.classList.add('active'); else s.classList.remove('active');
+                });
+                // update active link styles
+                links.forEach(a=>{
+                    const target = a.getAttribute('href') || '';
+                    if(target === '#'+id) a.classList.add('active'); else a.classList.remove('active');
+                });
+            }
+
+            // On link clicks: prevent default and update hash via history to avoid page jump
+            links.forEach(a=>{
+                a.addEventListener('click', (e)=>{
+                    e.preventDefault();
+                    const href = a.getAttribute('href');
+                    if(!href) return;
+                    // update URL hash without immediate jump; then show section
+                    history.pushState(null, '', href);
+                    showSection(href);
+                });
+            });
+        })();
+    </script>
+
+</body>
+</html>
