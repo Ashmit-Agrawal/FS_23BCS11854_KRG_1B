@@ -62,6 +62,7 @@ public class ProgressService {
 
     // Helper: calculate current streak for a habit
     private int calculateStreak(String habitId) {
+        
         List<Completion> completions = completionRepository.findByHabitId(habitId)
                 .stream()
                 .filter(Completion::isStatus)
